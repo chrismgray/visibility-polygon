@@ -74,7 +74,13 @@
                      next
                      (take-while #(not= % (:e2 best-seg))))))))
 
-(defn visibility-polygon [pt poly]
+(defn visibility-polygon
+  "Finds the visibility polygon of pt within poly.  This is the subset
+   of poly that pt can 'see', assuming that the edges of poly are opaque.
+   poly must be a simple polygon (that is, no self-intersections) and
+   it must be in counterclockwise order.  It is represented as a sequence
+   of points (defined as in pt/new-pt)."
+  [pt poly]
   (let [poly (fix-poly pt poly)
         [_ _ stack] (visibility-polygon-helper pt poly)]
     (vec (reverse stack))))
