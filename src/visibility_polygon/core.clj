@@ -53,7 +53,7 @@
 
 (defn- visibility-polygon-helper [pt poly]
   ((with-monad polygon-parser-m
-     (m-until #(empty? %) all-conditions poly)) pt []))
+     (m-until empty? all-conditions poly)) pt []))
 
 (defn fix-poly
   "Takes a point and a poly and returns a new poly with one point added.
