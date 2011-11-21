@@ -20,16 +20,16 @@
             (fn [pt stack]
               (some identity (map #(% pt stack) parsers))))])
 
-(def visible? (complement pt/left-turn?))
+(def- visible? (complement pt/left-turn?))
 
-(defn add-new-pt [poly]
+(defn- add-new-pt [poly]
   (fn [pt stack]
     (when (or (empty? stack) ; First two points are guaranteed to be visible
               (empty? (rest stack))
               (visible? pt (first poly) (first stack)))
       [pt (rest poly) (cons (first poly) stack)])))
 
-(defn pop-stack [poly]
+(defn- pop-stack [poly]
   (fn [pt stack]
     (let [the-seg (seg/new-seg pt (first poly))
           top-seg (seg/new-seg (first stack) (second stack))]
@@ -38,7 +38,7 @@
           [pt poly (cons (seg/intersection the-seg top-seg) stack)]
           [pt poly (rest stack)])))))
 
-(defn skip-pt [poly]
+(defn- skip-pt [poly]
   (fn [pt stack]
    (let [the-seg (seg/new-seg pt (first stack))
          poly-seg (seg/new-seg (first poly) (second poly))]
@@ -47,11 +47,11 @@
          [pt (cons (seg/intersection the-seg poly-seg) (rest poly)) stack]
          [pt (rest poly) stack])))))
 
-(defn all-conditions [poly]
+(defn- all-conditions [poly]
   (with-monad polygon-parser-m
     (m-plus (add-new-pt poly) (pop-stack poly) (skip-pt poly))))
 
-(defn visibility-polygon-helper [pt poly]
+(defn- visibility-polygon-helper [pt poly]
   ((with-monad polygon-parser-m
      (m-until #(empty? %) all-conditions poly)) pt []))
 
