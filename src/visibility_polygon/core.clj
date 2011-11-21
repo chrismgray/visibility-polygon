@@ -24,8 +24,10 @@
 
 (defn add-new-pt [poly]
   (fn [pt stack]
-    (when (visible? pt (first poly) (first stack))
-      [pt (rest poly) (vec (cons (first poly) stack))])))
+    (when (or (empty? stack) ; First two points are guaranteed to be visible
+              (empty? (rest stack))
+              (visible? pt (first poly) (first stack)))
+      [pt (rest poly) (cons (first poly) stack)])))
 
 (defn pop-stack [poly]
   (fn [pt stack]
