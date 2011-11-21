@@ -18,8 +18,7 @@
             nil)
    m-plus (fn [& parsers]
             (fn [pt stack]
-              (drop-while nil?
-                          (map #(% pt stack) parsers))))])
+              (some identity (map #(% pt stack) parsers))))])
 
 (def visible? (complement pt/left-turn?))
 
