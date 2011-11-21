@@ -52,5 +52,29 @@
     (m-plus (add-new-pt poly) (pop-stack poly) (skip-pt poly))))
 
 (defn visibility-polygon-helper [pt poly]
-  (with-monad polygon-parser-m
-    (m-until #(seq %) all-conditions poly)) pt [])
+  ((with-monad polygon-parser-m
+     (m-until #(empty? %) all-conditions poly)) pt []))
+
+(defn fix-poly
+  "Takes a point and a poly and returns a new poly with one point added.
+   That point that is added is the closest point to the input point that
+   is on the boundary of the poly and is directly to the right of the input
+   point."
+  [pt poly]
+  (let [segs (map seg/new-seg (cons (last poly) poly) poly)
+        horizontal-seg (seg/new-seg pt (pt/new-pt (+ 1 (pt :x)) (pt :y)))
+        best-seg (->> segs
+                      (filter #(seg/intersection-on-seg? horizontal-seg %))
+                      (filter #(> (:x (seg/intersection horizontal-seg %)) (:x pt)))
+                      (apply min-key #(:x (seg/intersection horizontal-seg %))))]
+    (cons (seg/intersection horizontal-seg best-seg)
+          (cons (:e2 best-seg)
+                (->> (concat poly poly)
+                     (drop-while #(not= % (:e2 best-seg)))
+                     next
+                     (take-while #(not= % (:e2 best-seg))))))))
+
+(defn visibility-polygon [pt poly]
+  (let [poly (fix-poly pt poly)
+        [_ _ stack] (visibility-polygon-helper pt poly)]
+    (vec (reverse stack))))
