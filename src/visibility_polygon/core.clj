@@ -13,7 +13,13 @@
               (let [result (mv pt poly stack)]
                 (when (not= nil result)
                   (let [[pt new-poly new-stack] result]
-                    ((f nil) pt new-poly new-stack))))))])
+                    ((f nil) pt new-poly new-stack))))))
+   m-zero (fn [pt poly stack]
+            nil)
+   m-plus (fn [& parsers]
+            (fn [pt poly stack]
+              (drop-while nil?
+                          (map #(% pt poly stack) parsers))))])
 
 (def visible? (complement pt/left-turn?))
 
