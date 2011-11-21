@@ -1,1 +1,2 @@
-(ns visibility-polygon.core)
+(ns visibility-polygon.core
+  (:require [visibility-polygon.seg :as seg]))
