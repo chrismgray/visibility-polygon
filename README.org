@@ -1,0 +1,14 @@
+
+* Visibility Polygon
+
+  This code finds the "visibility polygon" of a point inside a
+  polgyon.  That is the subset of the polygon that the point can see,
+  assuming that the polygon has opaque walls.
+
+  This code is at an experimental stage and should not be used.
+  
+* License
+
+  Copyright (C) 2011 Chris Gray
+
+  Distributed under the GNU GPL Version 3.
