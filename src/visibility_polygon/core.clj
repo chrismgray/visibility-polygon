@@ -20,7 +20,7 @@
             (fn [pt stack]
               (some identity (map #(% pt stack) parsers))))])
 
-(def- visible? (complement pt/left-turn?))
+(def visible? (complement pt/left-turn?))
 
 (defn- add-new-pt [poly]
   (fn [pt stack]
@@ -34,7 +34,8 @@
     (let [the-seg (seg/new-seg pt (first poly))
           top-seg (seg/new-seg (first stack) (second stack))]
       (when (pt/left-turn? (second stack) (first stack) (first poly))
-        (if (seg/intersection-on-seg? the-seg top-seg)
+        (if (and (seg/intersection-on-seg? the-seg top-seg)
+                 (seg/pt-on-seg? (seg/intersection the-seg top-seg) top-seg))
           [pt poly (cons (seg/intersection the-seg top-seg) stack)]
           [pt poly (rest stack)])))))
 
@@ -43,7 +44,8 @@
    (let [the-seg (seg/new-seg pt (first stack))
          poly-seg (seg/new-seg (first poly) (second poly))]
      (when (not (pt/left-turn? (second stack) (first stack) (first poly)))
-       (if (seg/intersection-on-seg? the-seg poly-seg)
+       (if (and (seg/intersection-on-seg? the-seg poly-seg)
+                (seg/pt-on-seg? (seg/intersection the-seg poly-seg) poly-seg))
          [pt (cons (seg/intersection the-seg poly-seg) (rest poly)) stack]
          [pt (rest poly) stack])))))
 
@@ -65,8 +67,10 @@
         horizontal-seg (seg/new-seg pt (pt/new-pt (+ 1 (pt :x)) (pt :y)))
         best-seg (->> segs
                       (filter #(seg/intersection-on-seg? horizontal-seg %))
+                      (filter #(seg/pt-on-seg? (seg/intersection % horizontal-seg) %))
                       (filter #(> (:x (seg/intersection horizontal-seg %)) (:x pt)))
                       (apply min-key #(:x (seg/intersection horizontal-seg %))))]
+    (assert (= (:y pt) (:y (seg/intersection horizontal-seg best-seg))))
     (cons (seg/intersection horizontal-seg best-seg)
           (cons (:e2 best-seg)
                 (->> (concat poly poly)

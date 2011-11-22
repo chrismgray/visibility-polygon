@@ -41,7 +41,7 @@
 
 (defn pt-inside-region?
   "Tests whether or not the given point is inside the counterclockwise-oriented
-   polygon defined by region."
+   convex polygon defined by region."
   [pt region]
   (every? #(or (pt/left-turn? (% :e1) (% :e2) pt)
                (pt-on-seg? pt %)) region))
